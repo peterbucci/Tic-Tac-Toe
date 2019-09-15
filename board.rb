@@ -1,17 +1,22 @@
 require_relative "tile"
 
 class Board
+    attr_reader :grid
+
     def initialize
-        @grid = Array.new(3, Array.new(3) { Tile.new } )
+        @grid = Array.new(3) { Array.new(3) { Tile.new } }
     end
 
     def render
-        puts "    #{(0...@grid.length).map(&:to_s).join(" ")}"
+        puts ""
         @grid.each_with_index do |row, i| 
             row_render = "#{i} | "
             row.each { |tile| row_render += "#{tile.value} " }
             puts row_render
         end
+        puts "    - - -"
+        puts "    #{(0...@grid.length).map(&:to_s).join(" ")}"
+        puts ""
     end
 
     def val(pos)

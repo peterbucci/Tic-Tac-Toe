@@ -5,6 +5,7 @@ class Game
 
     def initialize
         @board = Board.new
+        @whose_turn = "X"
 
         take_turn
     end
@@ -12,23 +13,32 @@ class Game
     def take_turn
         until win?
             board.render
-            puts "\n" + "Choose a position."
-            user_input = gets.chomp
+            puts "Choose a position."
+            user_input = valid_pos?(gets.chomp)
+            pos = parse_pos(user_input)
+            board.set_val(pos, @whose_turn)
+            @whose_turn == "X" ? @whose_turn = "O" : @whose_turn = "X"
         end
 
         end_game
     end
 
+    def valid_pos?(input)
+        input
+    end
+
+    def parse_pos(input)
+        input.split(",").map(&:to_i)
+    end
+
     def win?
-        false
+        board.grid.any? { |row| row.all? { |tile| tile.value == "X" || tile.value =="O" } }
     end
 
     def end_game
+        board.render
+        puts "Game over!"
     end
 end
 
 game = Game.new
-p game.board.val([0,0])
-game.board.set_val([0,0], "X")
-p game.board.val([0,0])
-p game.board.val([1,1])

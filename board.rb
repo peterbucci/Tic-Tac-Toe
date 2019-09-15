@@ -5,6 +5,15 @@ class Board
         @grid = Array.new(3, Array.new(3) { Tile.new } )
     end
 
+    def render
+        puts "    #{(0...@grid.length).map(&:to_s).join(" ")}"
+        @grid.each_with_index do |row, i| 
+            row_render = "#{i} | "
+            row.each { |tile| row_render += "#{tile.value} " }
+            puts row_render
+        end
+    end
+
     def val(pos)
         row, column = pos
         @grid[row][column].value
@@ -15,9 +24,3 @@ class Board
         @grid[row][column].value = new_val
     end
 end
-
-board = Board.new
-p board.val([0,0])
-board.set_val([0,0], "X")
-p board.val([0,0])
-p board.val([1,1])

@@ -1,17 +1,15 @@
-require_relative "tile"
-
 class Board
     attr_reader :grid
 
     def initialize
-        @grid = Array.new(3) { Array.new(3) { Tile.new } }
+        @grid = Array.new(3) { Array.new(3, nil) }
     end
 
     def render
         puts "\e[H\e[2J"
         @grid.each_with_index do |row, i| 
             row_render = "#{i} | "
-            row.each { |tile| row_render += "#{tile.value} " }
+            row.each { |tile| row_render += "#{tile || "*"} " }
             puts row_render
         end
         puts "    - - -"
@@ -26,11 +24,11 @@ class Board
 
     def val(pos)
         row, column = pos
-        @grid[row][column].value
+        @grid[row][column]
     end
 
     def set_val(pos, new_val)
         row, column = pos
-        @grid[row][column].value = new_val
+        @grid[row][column] = new_val
     end
 end

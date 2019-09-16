@@ -1,8 +1,6 @@
 require_relative "board"
 
 class Game
-    attr_reader :board
-
     def initialize
         @board = Board.new
         @whose_turn = "O"
@@ -14,18 +12,18 @@ class Game
         until win?
             @whose_turn == "X" ? @whose_turn = "O" : @whose_turn = "X"
             board.render
-            puts "Choose a position."
-            pos = validate_and_parse(gets.chomp)
+            puts "Choose a position. e.g. 1,2"
+            pos = parse_pos(gets.chomp)
             board.set_val(pos, @whose_turn)
         end
 
         end_game
     end
 
-    def validate_and_parse(user_input)
+    def parse_pos(user_input)
         if /^[0-2],[0-2]$/.match(user_input)
             pos = user_input.split(",").map(&:to_i)
-            return pos if board.val(pos) == "*"
+            return pos unless board.val(pos)
 
             message = "Someone already selected this square."
         else
@@ -34,14 +32,13 @@ class Game
 
         board.render
         puts message
-        puts ""
-        puts "Please enter a *valid* position. e.g. 1,2"
-        validate_and_parse(gets.chomp)
+        puts "\n" + "Please enter a *valid* position. e.g. 1,2"
+        parse_pos(gets.chomp)
     end
 
     def win?
         rows = board.grid + board.grid.transpose + board.diagnols
-        rows.any? { |row| row.all? { |tile| tile.value == @whose_turn } }
+        rows.any? { |row| row.all? { |tile| tile == @whose_turn } }
     end
 
     def end_game
@@ -50,6 +47,9 @@ class Game
         puts "\n#{@whose_turn} wins!"
         puts ""
     end
+
+    private
+    attr_reader :board
 end
 
 game = Game.new

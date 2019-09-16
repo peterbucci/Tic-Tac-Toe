@@ -1,5 +1,6 @@
 class Player
-    attr_reader :ai
+    attr_accessor :mark
+    attr_reader :ai, :name
 
     def self.setup(players)
         n = (players.length + 1).to_s
@@ -12,8 +13,8 @@ class Player
         user_input = gets.chomp.downcase
 
         until /(^yes$)|(^no$)/.match?(user_input)
-        puts "\e[H\e[2J" + "Please enter yes or no"
-        user_input = gets.chomp.downcase
+            puts "\e[H\e[2J" + "Please enter yes or no"
+            user_input = gets.chomp.downcase
         end
 
         user_input == "yes" ? ai = true : ai = false

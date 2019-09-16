@@ -8,20 +8,24 @@ class Game
         until @players.length == 2
             @players << Player.setup(@players)
         end
-        @whose_turn = "O"
-        p @players
-        sleep(2)
 
-        take_turn
+        play
     end
 
-    def take_turn
+    def play
+        @players.shuffle!.each_with_index do |player, i| 
+            i == 0 ? player.mark = "X" : player.mark = "O" 
+        end
+
+        @current_player = @players[0]
+
         until win?
-            @whose_turn == "X" ? @whose_turn = "O" : @whose_turn = "X"
+            @current_player = @players.shift
+            @players << @current_player
             board.render
             puts "Choose a position. e.g. 1,2"
             pos = parse_pos(gets.chomp)
-            board.set_val(pos, @whose_turn)
+            board.set_val(pos, @current_player.mark)
         end
 
         end_game
@@ -45,13 +49,13 @@ class Game
 
     def win?
         rows = board.grid + board.grid.transpose + board.diagnols
-        rows.any? { |row| row.all? { |tile| tile == @whose_turn } }
+        rows.any? { |row| row.all? { |tile| tile == @current_player.mark } }
     end
 
     def end_game
         board.render
         puts "Game over"
-        puts "\n#{@whose_turn} wins!"
+        puts "\n#{@current_player.name} wins!"
         puts ""
     end
 

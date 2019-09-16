@@ -15,20 +15,28 @@ class Game
             @whose_turn == "X" ? @whose_turn = "O" : @whose_turn = "X"
             board.render
             puts "Choose a position."
-            user_input = valid_pos?(gets.chomp)
-            pos = parse_pos(user_input)
+            pos = validate_and_parse(gets.chomp)
             board.set_val(pos, @whose_turn)
         end
 
         end_game
     end
 
-    def valid_pos?(input)
-        input
-    end
+    def validate_and_parse(user_input)
+        if /^[0-2],[0-2]$/.match(user_input)
+            pos = user_input.split(",").map(&:to_i)
+            return pos if board.val(pos) == "*"
 
-    def parse_pos(input)
-        input.split(",").map(&:to_i)
+            message = "Someone already selected this square."
+        else
+            message = "Invalid input!"
+        end
+
+        board.render
+        puts message
+        puts ""
+        puts "Please enter a *valid* position. e.g. 1,2"
+        validate_and_parse(gets.chomp)
     end
 
     def win?
@@ -38,8 +46,9 @@ class Game
 
     def end_game
         board.render
-        puts "Game over!"
-        puts "#{@whose_turn} wins!"
+        puts "Game over"
+        puts "\n#{@whose_turn} wins!"
+        puts ""
     end
 end
 

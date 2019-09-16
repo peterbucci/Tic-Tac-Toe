@@ -19,6 +19,10 @@ class Board
         puts ""
     end
 
+    def diagnols
+        [[@grid[0][0], @grid[1][1], @grid[2][2]],[@grid[2][0], @grid[1][1], @grid[0][2]]]
+    end
+
     def val(pos)
         row, column = pos
         @grid[row][column].value

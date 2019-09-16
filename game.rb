@@ -5,19 +5,19 @@ class Game
 
     def initialize
         @board = Board.new
-        @whose_turn = "X"
+        @whose_turn = "O"
 
         take_turn
     end
 
     def take_turn
         until win?
+            @whose_turn == "X" ? @whose_turn = "O" : @whose_turn = "X"
             board.render
             puts "Choose a position."
             user_input = valid_pos?(gets.chomp)
             pos = parse_pos(user_input)
             board.set_val(pos, @whose_turn)
-            @whose_turn == "X" ? @whose_turn = "O" : @whose_turn = "X"
         end
 
         end_game
@@ -32,12 +32,14 @@ class Game
     end
 
     def win?
-        board.grid.any? { |row| row.all? { |tile| tile.value == "X" || tile.value =="O" } }
+        rows = board.grid + board.grid.transpose + board.diagnols
+        rows.any? { |row| row.all? { |tile| tile.value == @whose_turn } }
     end
 
     def end_game
         board.render
         puts "Game over!"
+        puts "#{@whose_turn} wins!"
     end
 end
 

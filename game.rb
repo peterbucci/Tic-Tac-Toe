@@ -1,9 +1,16 @@
 require_relative "board"
+require_relative "player"
 
 class Game
     def initialize
         @board = Board.new
+        @players = []
+        until @players.length == 2
+            @players << Player.setup(@players)
+        end
         @whose_turn = "O"
+        p @players
+        sleep(2)
 
         take_turn
     end
@@ -52,4 +59,4 @@ class Game
     attr_reader :board
 end
 
-game = Game.new
+Game.new

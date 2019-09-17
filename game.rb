@@ -34,7 +34,7 @@ class Game
     def parse_pos(user_input)
         if /^[0-2],[0-2]$/.match(user_input)
             pos = user_input.split(",").map(&:to_i)
-            return pos unless board.val(pos)
+            return pos if board.val(pos).empty?
 
             message = "Someone already selected this square."
         else

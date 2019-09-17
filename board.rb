@@ -1,15 +1,15 @@
 class Board
     attr_reader :grid
 
-    def initialize
-        @grid = Array.new(3) { Array.new(3, nil) }
+    def initialize(grid = Array.new(3) { Array.new(3, "") })
+        @grid = grid
     end
 
     def render
         puts "\e[H\e[2J"
         grid.each_with_index do |row, i| 
             row_render = "#{i} | "
-            row.each { |tile| row_render += "#{tile || "*"} " }
+            row.each { |tile| row_render += "#{tile.empty? ? "*" : tile} " }
             puts row_render
         end
         puts "    - - -"

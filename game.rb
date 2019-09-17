@@ -23,8 +23,16 @@ class Game
             @current_player = @players.shift
             @players << @current_player
             board.render
-            puts "Choose a position. e.g. 1,2"
-            pos = parse_pos(gets.chomp)
+            if @current_player.ai
+                new_grid = []
+                @board.grid.each { |row| new_grid << row.clone }
+                new_board = Board.new(new_grid)
+                user_input = @current_player.take_turn(new_board)
+            else
+                puts "Choose a position. e.g. 1,2"
+                user_input = gets.chomp
+            end
+            pos = parse_pos(user_input)
             board.set_val(pos, @current_player.mark)
         end
 

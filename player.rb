@@ -4,6 +4,8 @@ class Player
     attr_accessor :mark
     attr_reader :ai, :name
 
+    @@current_node = nil
+
     def self.setup(players)
         n = (players.length + 1).to_s
         puts "\e[H\e[2J" + "What is player #{n}'s name?"
@@ -28,30 +30,32 @@ class Player
         @name = name
         @mark = nil
         @ai = ai
-        @current_node = nil
     end
 
     def take_turn(board)
-        @current_node = build_tree(board) if @current_node.nil?
+        @@current_node = build_tree(board) if @@current_node.nil?
 
-        node_matches_board = @current_node.board_state.grid == board.grid
-        @current_node = move_node(board) unless node_matches_board
-            
-        @current_node = select_move
+        @@current_node = @ai ? ai_move : human_move
 
-        @current_node.prev_coord
+        @@current_node.prev_coord
     end
-    
-    def move_node(board)
-        @current_node.children.each do |child|
-            return child if child.board_state.grid == board.grid
+
+    def human_move(message = "Choose a position. e.g. 1,2")
+        puts message
+        user_input = gets.chomp
+
+        @@current_node.children.each do |child| 
+            return child if child.prev_coord == user_input
         end
+
+        puts ""
+        human_move("Invalid move!")
     end
 
-    def select_move
+    def ai_move
         selected_move = nil
 
-        @current_node.children.each do |child| 
+        @@current_node.children.each do |child| 
             selected_move = child if selected_move.nil?
 
             if no_winning_paths
@@ -66,10 +70,13 @@ class Player
     end
 
     def no_winning_paths
-        @current_node.children.all? { |child| child.winning_paths == 0 }
+        @@current_node.children.all? { |child| child.winning_paths == 0 }
     end
 
     def build_tree(board)
-        TicTacToeNode.new(board, @mark, @mark)
+        print "Building Game - Please Wait..." + "\r" + "\n"
+        $stdout.flush
+        ai_mark = @ai ? "X" : "O"
+        TicTacToeNode.new(board, ai_mark, @mark)
     end
 end

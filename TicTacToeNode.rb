@@ -1,5 +1,3 @@
-require_relative "board"
-
 class TicTacToeNode
   attr_reader :children, :prev_coord, :board_state
   attr_accessor :winning_paths, :losing_paths, :tied_paths

@@ -5,9 +5,7 @@ class Game
     def initialize
         @board = Board.new
         @players = []
-        until @players.length == 2
-            @players << Player.setup(@players)
-        end
+        @players << Player.setup(@players) until @players.length == 2
 
         play
     end
@@ -22,34 +20,16 @@ class Game
         until win?
             @current_player = @players.shift
             @players << @current_player
+
             board.render
-            if @current_player.ai
-                user_input = @current_player.take_turn(board.clone)
-            else
-                puts "Choose a position. e.g. 1,2"
-                user_input = gets.chomp
-            end
-            pos = parse_pos(user_input)
+
+            user_input = @current_player.take_turn(board.clone)
+            pos = user_input.split(",").map(&:to_i)
+            
             board.set_val(pos, @current_player.mark)
         end
 
         end_game
-    end
-
-    def parse_pos(user_input)
-        if /^[0-2],[0-2]$/.match(user_input)
-            pos = user_input.split(",").map(&:to_i)
-            return pos if board.val(pos).empty?
-
-            message = "Someone already selected this square."
-        else
-            message = "Invalid input!"
-        end
-
-        board.render
-        puts message
-        puts "\n" + "Please enter a *valid* position. e.g. 1,2"
-        parse_pos(gets.chomp)
     end
 
     def win?

@@ -6,12 +6,14 @@ class Board
     end
 
     def render
-        puts "\e[H\e[2J"
         grid.each_with_index do |row, i| 
             row_render = "#{i} | "
+            row_render = "\e[H\e[2J" + row_render if i == 0
+
             row.each { |tile| row_render += "#{tile.empty? ? "*" : tile} " }
             puts row_render
         end
+
         puts "    - - -"
         puts "    #{(0...grid.length).map(&:to_s).join(" ")}"
         puts ""

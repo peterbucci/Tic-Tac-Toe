@@ -1,8 +1,3 @@
-# Idea: To search for the fatest path to victory that comes before a loss.
-# build an array of pos and have the ai follow the array unless the user breaks
-# the array pattern that was created. If this happens rebuilding the array of pos
-# and have the ai follow that new path
-
 class TicTacToeNode
   attr_reader :children, :prev_coord, :board_state, :current_mark, :parent
   attr_accessor :x_wins_paths, :o_wins_paths, :tied_paths

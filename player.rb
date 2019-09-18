@@ -28,54 +28,48 @@ class Player
         @name = name
         @mark = nil
         @ai = ai
-        @current_move = nil
+        @current_node = nil
     end
 
     def take_turn(board)
-        build_tree(board) if @current_move.nil?
-        move_tree(board) unless @current_move.board_state.grid == board.grid
-        if @current_move.children.all? { |child| child.winning_paths == 0 }
-            select_tie_move
-        else
-            select_move
-        end
+        @current_node = build_tree(board) if @current_node.nil?
+
+        node_matches_board = @current_node.board_state.grid == board.grid
+        @current_node = move_node(board) unless node_matches_board
+            
+        @current_node = select_move
+
+        @current_node.prev_coord
     end
     
-    def move_tree(board)
-        @current_move.children.each do |child|
-            @current_move = child if child.board_state.grid == board.grid
+    def move_node(board)
+        @current_node.children.each do |child|
+            return child if child.board_state.grid == board.grid
         end
     end
 
     def select_move
         selected_move = nil
-        @current_move.children.each do |child| 
-            if child.winning_node?(child.board_state)
-                return child.prev_coord
-            elsif selected_move.nil? || child.winning_paths > selected_move.winning_paths
-                selected_move = child
+
+        @current_node.children.each do |child| 
+            selected_move = child if selected_move.nil?
+
+            if no_winning_paths
+                selected_move = child if child.tied_paths > selected_move.tied_paths
+            else
+                return child if child.winning_node?(@mark)
+                selected_move = child if child.winning_paths > selected_move.winning_paths
             end
         end
 
-        @current_move = selected_move
-        selected_move.prev_coord
+        selected_move
     end
 
-    def select_tie_move
-        selected_move = nil
-        @current_move.children.each do |child| 
-            if child.winning_node?(child.board_state)
-                return child.prev_coord
-            elsif selected_move.nil? || child.tied_paths > selected_move.tied_paths
-                selected_move = child
-            end
-        end
-
-        @current_move = selected_move
-        selected_move.prev_coord
+    def no_winning_paths
+        @current_node.children.all? { |child| child.winning_paths == 0 }
     end
 
     def build_tree(board)
-        @current_move = TicTacToeNode.new(board, @mark, @mark)
+        TicTacToeNode.new(board, @mark, @mark)
     end
 end

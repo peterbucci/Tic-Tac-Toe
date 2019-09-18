@@ -11,33 +11,25 @@ class TicTacToeNode
     @parent = parent
     @prev_coord = prev_coord
 
-    won = winning_node?(@board_state)
-    lost = losing_node?(@board_state)
-    
-    won || lost ? @children = [] : @children = find_children
-    won ? @winning_paths = 1 : @winning_paths = 0
-    lost ? @losing_paths = 1 : @losing_paths = 0
-    !won && !lost && @children.empty? ? @tied_paths = 1 : @tied_paths = 0
+    won = winning_node?(@ai_mark)
+    @ai_mark == "X" ? player_mark = "O" : player_mark = "X"
+    lost = winning_node?(player_mark)
 
-    @children.each do |child|
-      @winning_paths = (child.winning_paths + @winning_paths)
-      @losing_paths = (child.losing_paths + @losing_paths)
-      @tied_paths = (child.tied_paths + @tied_paths)
-    end
+    @children = won || lost ? [] : find_children
+    @winning_paths = won ? 1 : 0
+    @losing_paths = lost ? 1 : 0
+    @tied_paths = !won && !lost && @children.empty? ? 1 : 0
 
-    @winning_paths = 0 if lost
-    @tied_paths = 0 if lost
+    add_child_paths
   end
 
   def find_children
     children = []
-    
+
     @board_state.grid.each_with_index do |row, i|
       row.each_with_index do |square, j|
         if square.empty?
-          new_grid = []
-          @board_state.grid.each { |row| new_grid << row.clone }
-          new_state = Board.new(new_grid)
+          new_state = @board_state.clone
           new_state.set_val([i, j], @current_mark)
 
           @current_mark == "X" ? next_mark = "O" : next_mark = "X"
@@ -49,14 +41,16 @@ class TicTacToeNode
     children
   end
 
-  def winning_node?(board)
-    rows = board.grid + board.grid.transpose + board.diagnols
-    rows.any? { |row| row.all? { |tile| tile == @ai_mark } }
+  def winning_node?(mark)
+    rows = @board_state.grid + @board_state.grid.transpose + @board_state.diagnols
+    rows.any? { |row| row.all? { |tile| tile == mark } }
   end
 
-  def losing_node?(board)
-    @ai_mark == "X" ? player_mark = "O" : player_mark = "X"
-    rows = board.grid + board.grid.transpose + board.diagnols
-    rows.any? { |row| row.all? { |tile| tile == player_mark } }
+  def add_child_paths
+    @children.each do |child|
+      @winning_paths = (child.winning_paths + @winning_paths)
+      @losing_paths = (child.losing_paths + @losing_paths)
+      @tied_paths = (child.tied_paths + @tied_paths)
+    end
   end
 end

@@ -24,10 +24,7 @@ class Game
             @players << @current_player
             board.render
             if @current_player.ai
-                new_grid = []
-                @board.grid.each { |row| new_grid << row.clone }
-                new_board = Board.new(new_grid)
-                user_input = @current_player.take_turn(new_board)
+                user_input = @current_player.take_turn(board.clone)
             else
                 puts "Choose a position. e.g. 1,2"
                 user_input = gets.chomp

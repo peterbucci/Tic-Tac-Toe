@@ -31,4 +31,10 @@ class Board
         row, column = pos
         @grid[row][column] = new_val
     end
+
+    def clone
+        new_grid = []
+        @grid.each { |row| new_grid << row.clone }
+        Board.new(new_grid)
+    end
 end

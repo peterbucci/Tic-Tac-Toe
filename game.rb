@@ -20,7 +20,7 @@ class Game
 
         @current_player = @players[0]
 
-        until win?
+        until win? || board.grid.flatten(1).none?(&:empty?)
             @current_player = @players.shift
             @players << @current_player
 
@@ -43,7 +43,7 @@ class Game
     def end_game
         board.render
         puts "Game over"
-        puts "\n#{@current_player.name} wins!"
+        puts "\n#{@current_player.name} wins!" if win?
         puts ""
     end
 

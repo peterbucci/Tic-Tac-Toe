@@ -26,13 +26,24 @@ class Player
         @name = name
         @mark = nil
         @ai = ai
+        @path_to_victory = []
     end
 
     def take_turn(current_node)
-        @ai ? ai_move(current_node) : human_move(current_node)
+        if @ai
+            if @path_to_victory.empty? || path_is_broken?(current_node)
+                opponents_mark = @mark == "X" ? "O" : "X"
+                endpoint = current_node.find_path(@mark, opponents_mark)
+                @path_to_victory = current_node.build_path(endpoint)
+            end
+
+            @path_to_victory.shift
+        else
+            get_input(current_node)
+        end
     end
 
-    def human_move(current_node, message = "Choose a position. e.g. 1,2")
+    def get_input(current_node, message = "Choose a position. e.g. 1,2")
         puts message
         user_input = gets.chomp
 
@@ -41,33 +52,18 @@ class Player
         end
 
         puts ""
-        human_move(current_node, "Invalid move!")
+        get_input(current_node, "Invalid move!")
     end
 
-    def ai_move(current_node)
-        selected_move = nil
+    def path_is_broken?(current_node)
+        if current_node.current_mark == @mark
+            next_move = @path_to_victory[0].prev_coord
+            !current_node.children.include?(next_move)
+        else
+            last_move = @path_to_victory.shift
+            return false unless current_node.parent.prev_coord == last_move.prev_coord
 
-        current_node.children.each do |child| 
-            selected_move = child if selected_move.nil?
-
-            if no_winning_paths(current_node)
-                selected_move = child if child.tied_paths > selected_move.tied_paths
-            else
-                return child if child.winning_node?(@mark)
-                if @mark == "X"
-                    selected_move = child if child.x_wins_paths > selected_move.x_wins_paths
-                else
-                    selected_move = child if child.o_wins_paths > selected_move.o_wins_paths
-                end
-            end
-        end
-
-        selected_move
-    end
-
-    def no_winning_paths(current_node)
-        current_node.children.all? do |child| 
-            @mark == "X" ? child.x_wins_paths == 0  : child.o_wins_paths == 0
+            path_is_broken?(current_node)
         end
     end
 end

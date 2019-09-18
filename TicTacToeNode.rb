@@ -4,7 +4,7 @@
 # and have the ai follow that new path
 
 class TicTacToeNode
-  attr_reader :children, :prev_coord, :board_state
+  attr_reader :children, :prev_coord, :board_state, :current_mark, :parent
   attr_accessor :x_wins_paths, :o_wins_paths, :tied_paths
 
   def initialize(board, current_mark, parent = nil, prev_coord = nil)
@@ -53,5 +53,42 @@ class TicTacToeNode
       @o_wins_paths = (child.o_wins_paths + @o_wins_paths)
       @tied_paths = (child.tied_paths + @tied_paths)
     end
+  end
+
+  def find_path(mark, losing_mark)
+    queue = [self]
+    current_node = self
+
+    no_winning_paths = mark == "X" ? current_node.x_wins_paths == 0 : current_node.o_wins_paths == 0
+
+    until queue.empty?
+      current_node = queue.shift
+      return current_node if current_node.winning_node?(mark)
+
+      current_node.children.each do |child|
+        queue << child unless child.children.any? { |subchild| subchild.winning_node?(losing_mark) }
+      end
+    end
+
+    unless @children.empty?
+      return self.children.reject do |child| 
+        child.children.any? { |subchild| subchild.winning_node?(losing_mark) }
+      end.sample
+    end
+    
+    return self.children.sample
+  end
+
+  def build_path(endpoint)
+    current_node = endpoint
+    winning_path = []
+
+    until current_node == self
+      winning_path << current_node
+
+      current_node = current_node.parent
+    end
+
+    winning_path.reverse
   end
 end

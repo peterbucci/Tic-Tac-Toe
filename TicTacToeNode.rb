@@ -1,22 +1,25 @@
+# Idea: To search for the fatest path to victory that comes before a loss.
+# build an array of pos and have the ai follow the array unless the user breaks
+# the array pattern that was created. If this happens rebuilding the array of pos
+# and have the ai follow that new path
+
 class TicTacToeNode
   attr_reader :children, :prev_coord, :board_state
-  attr_accessor :winning_paths, :losing_paths, :tied_paths
+  attr_accessor :x_wins_paths, :o_wins_paths, :tied_paths
 
-  def initialize(board, ai_mark, current_mark, parent = nil, prev_coord = nil)
+  def initialize(board, current_mark, parent = nil, prev_coord = nil)
     @board_state = board
-    @ai_mark = ai_mark
     @current_mark = current_mark
     @parent = parent
     @prev_coord = prev_coord
 
-    won = winning_node?(@ai_mark)
-    @ai_mark == "X" ? player_mark = "O" : player_mark = "X"
-    lost = winning_node?(player_mark)
+    x_wins = winning_node?("X")
+    o_wins = winning_node?("O")
 
-    @children = won || lost ? [] : find_children
-    @winning_paths = won ? 1 : 0
-    @losing_paths = lost ? 1 : 0
-    @tied_paths = !won && !lost && @children.empty? ? 1 : 0
+    @children = x_wins || o_wins ? [] : find_children
+    @x_wins_paths = x_wins ? 1 : 0
+    @o_wins_paths = o_wins ? 1 : 0
+    @tied_paths = !x_wins && !o_wins && @children.empty? ? 1 : 0
 
     add_child_paths
   end
@@ -31,7 +34,7 @@ class TicTacToeNode
           new_state.set_val([i, j], @current_mark)
 
           @current_mark == "X" ? next_mark = "O" : next_mark = "X"
-          children << TicTacToeNode.new(new_state, @ai_mark, next_mark, self, "#{i},#{j}")
+          children << TicTacToeNode.new(new_state, next_mark, self, "#{i},#{j}")
         end
       end
     end
@@ -46,8 +49,8 @@ class TicTacToeNode
 
   def add_child_paths
     @children.each do |child|
-      @winning_paths = (child.winning_paths + @winning_paths)
-      @losing_paths = (child.losing_paths + @losing_paths)
+      @x_wins_paths = (child.x_wins_paths + @x_wins_paths)
+      @o_wins_paths = (child.o_wins_paths + @o_wins_paths)
       @tied_paths = (child.tied_paths + @tied_paths)
     end
   end

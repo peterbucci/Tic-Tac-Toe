@@ -1,11 +1,14 @@
 require_relative "board"
 require_relative "player"
+require_relative "TicTacToeNode"
 
 class Game
     def initialize
         @board = Board.new
         @players = []
         @players << Player.setup(@players) until @players.length == 2
+        puts "\e[H\e[2J" + "Loading..."
+        @current_node = TicTacToeNode.new(board, "X")
 
         play
     end
@@ -23,9 +26,9 @@ class Game
 
             board.render
 
-            user_input = @current_player.take_turn(board.clone)
-            pos = user_input.split(",").map(&:to_i)
-            
+            @current_node = @current_player.take_turn(@current_node)
+            pos = @current_node.prev_coord.split(",").map(&:to_i)
+
             board.set_val(pos, @current_player.mark)
         end
 
